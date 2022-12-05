@@ -1,18 +1,21 @@
 
-const { Connection, PublicKey, TransactionInstruction, clusterApiUrl } = require("@solana/web3.js")
-const { SystemProgram, SYSVAR_RENT_PUBKEY, } = require("@solana/web3.js")
-const { MintLayout,  createInitializeMintInstruction, createMintToInstruction, TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } = require("@solana/spl-token")
-const {
+import { Connection, PublicKey, TransactionInstruction, clusterApiUrl } from "@solana/web3.js"
+import { SystemProgram, SYSVAR_RENT_PUBKEY } from "@solana/web3.js"
+import { MintLayout, createInitializeMintInstruction, createMintToInstruction, TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from "@solana/spl-token"
+import { BN } from "@project-serum/anchor"
+import {
 	DataV2,
 	Collection,
 	Creator,
-	CreateMetadataV2,
-	CreateMasterEditionV3,
-} = require("@metaplex-foundation/mpl-token-metadata")
-const { Uses } = require("@metaplex-foundation/mpl-token-metadata")
+	CreateMetadataAccountV2InstructionArgs,
+	CreateMasterEditionV3InstructionArgs,
+    createCreateMetadataAccountV2Instruction,
+    createCreateMasterEditionV3Instruction,
+} from "@metaplex-foundation/mpl-token-metadata"
+import type { Uses } from "@metaplex-foundation/mpl-token-metadata"
 
-const {Program,AnchorProvider, web3, utils, BN } = require("@project-serum/anchor");
-const { bs58 } = require("@project-serum/anchor/dist/cjs/utils/bytes")
+import {Program,AnchorProvider, web3, utils } from "@project-serum/anchor";
+import { bs58 } from "@project-serum/anchor/dist/cjs/utils/bytes"
 
 const walletSecretKey = "4q7nQc1CxJiF4tgnmhVc1p1DM2itAXdT3WHNJg6F1nLAfFzRudM7sSZJ3egnjaPVyobkPuWxPx8Q75CcKmga5qKG";
 
@@ -21,17 +24,17 @@ const signer = web3.Keypair.fromSecretKey(bs58.decode(walletSecretKey));
 const metaData = {"name":"Test Banana NFT","symbol":"TNFT","description":"Banana NFT description","seller_fee_basis_points":2500,"image":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/1360px-Banana-Single.jpg","attributes":[{"trait_type":"color","value":"yellow","display_type":"color"},{"trait_type":"size","value":"medium","display_type":"size"}],"external_url":"","properties":{"files":[{"uri":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/1360px-Banana-Single.jpg","type":"unknown"}],"category":"image","creators":[{"address":"2XyukL1KvwDkfNcdBpfXbj6UtPqF7zcUdTDURNjLFAMo","share":100}]}}
 
 const network = clusterApiUrl("devnet");
-const opts ={
-    preflightCommitment: "processed"
-  }
+// const opts ={
+//     preflightCommitment: "processed"
+//   }
 
-const connection = new Connection(network, opts.preflightCommitment);
+const connection = new Connection(network);
 
 
 
 function createMetaData(metaData){
 
-    return {
+    return ({
         name: metaData.name,
         symbol: metaData.symbol,
         uri: metaData.properties.files[0].uri,
@@ -39,7 +42,7 @@ function createMetaData(metaData){
         creators: metaData.creators,
         collection: null,
         uses: metaData.uses,
-    }
+    })
 }
 
 async function getMintInstructions(connection, masterEditionSupply){
@@ -61,7 +64,7 @@ const metadataAccount = await getMetadata(mint.publicKey)
 const editionAccount = await getMasterEdition(mint.publicKey)
 
 
-const mint_tx = await new web3.Transaction().add(
+const mint_tx = new web3.Transaction().add(
     SystemProgram.createAccount({
         fromPubkey: signer.publicKey,
         newAccountPubkey: mint.publicKey,
@@ -74,24 +77,24 @@ const mint_tx = await new web3.Transaction().add(
         0,
         mint.publicKey,
         signer.publicKey,
-        signer.publicKey,
+        signer.publicKey
     ),
-   createAssociatedTokenAccountInstruction(
+    createAssociatedTokenAccountInstruction(
         userTokenAccoutAddress,
         signer.publicKey,
         signer.publicKey,
-        mint.publicKey,
+        mint.publicKey
     ),
-    ({ feePayer: signer.publicKey },
+    createCreateMetadataAccountV2Instruction(
         {
             metadata: metadataAccount,
-            metadataData: createMetaData(metaData),
+            // metadataData: createMetaData(metaData),
             updateAuthority: signer.publicKey,
             mint: mint.publicKey,
             mintAuthority: signer.publicKey,
-			systemProgram: SystemProgram,
-			rent: rent_mint
-    }),
+            payer: signer.publicKey
+        }, {createMetadataAccountArgsV2: {data: createMetaData(metaData), isMutable: false}} 
+    ),
     createMintToInstruction(
         mint.publicKey,
         userTokenAccoutAddress,
@@ -99,23 +102,22 @@ const mint_tx = await new web3.Transaction().add(
         5,
         []
     ),
-	(
-            {
-                feePayer: signer.publicKey,
-            },
-            {
-                edition: editionAccount,
-                metadata: metadataAccount,
-                mint: mint.publicKey,
-                mintAuthority: signer.publicKey,
-                updateAuthority: signer.publicKey,
-                maxSupply: new BN(masterEditionSupply),
-            }),
-)
+    (
+        createCreateMasterEditionV3Instruction(
+        {
+            edition: editionAccount,
+            metadata: metadataAccount,
+            mint: mint.publicKey,
+            mintAuthority: signer.publicKey,
+            updateAuthority: signer.publicKey,
+            payer: signer.publicKey,
+        }, {createMasterEditionArgs: {maxSupply: new BN(masterEditionSupply)}},
+    )
+))
+    console.log(mint_tx)
+let x = await web3.sendAndConfirmTransaction(connection, mint_tx, [signer, mint])
+console.log(x)
 
-await web3.sendAndConfirmTransaction(connection, mint_tx, [signer])
-
-console.log(mint_tx)
 // }
 }
 
