@@ -59,6 +59,7 @@ const userTokenAccoutAddress = await getTokenWallet(
     signer.publicKey,
     mint.publicKey,
 )
+console.log(signer)
 
 const metadataAccount = await getMetadata(mint.publicKey)
 const editionAccount = await getMasterEdition(mint.publicKey)
@@ -73,11 +74,11 @@ const mint_tx = new web3.Transaction().add(
         programId: TOKEN_PROGRAM_ID,
     }),
     createInitializeMintInstruction(
-        TOKEN_PROGRAM_ID,
-        0,
         mint.publicKey,
+        0,
         signer.publicKey,
-        signer.publicKey
+        signer.publicKey,
+        TOKEN_PROGRAM_ID
     ),
     createAssociatedTokenAccountInstruction(
         userTokenAccoutAddress,
@@ -93,14 +94,15 @@ const mint_tx = new web3.Transaction().add(
             mint: mint.publicKey,
             mintAuthority: signer.publicKey,
             payer: signer.publicKey
-        }, {createMetadataAccountArgsV2: {data: createMetaData(metaData), isMutable: false}} 
+        }, {createMetadataAccountArgsV2: {data: createMetaData(metaData), isMutable: true}} 
     ),
     createMintToInstruction(
         mint.publicKey,
         userTokenAccoutAddress,
         signer.publicKey,
         5,
-        []
+        [],
+		TOKEN_PROGRAM_ID
     ),
     (
         createCreateMasterEditionV3Instruction(
@@ -113,7 +115,10 @@ const mint_tx = new web3.Transaction().add(
             payer: signer.publicKey,
         }, {createMasterEditionArgs: {maxSupply: new BN(masterEditionSupply)}},
     )
-))
+)
+)
+mint_tx.feePayer = signer.publicKey
+
     console.log(mint_tx)
 let x = await web3.sendAndConfirmTransaction(connection, mint_tx, [signer, mint])
 console.log(x)
