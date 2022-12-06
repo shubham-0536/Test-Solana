@@ -20,8 +20,9 @@ import { bs58 } from "@project-serum/anchor/dist/cjs/utils/bytes"
 const walletSecretKey = "4q7nQc1CxJiF4tgnmhVc1p1DM2itAXdT3WHNJg6F1nLAfFzRudM7sSZJ3egnjaPVyobkPuWxPx8Q75CcKmga5qKG";
 
 const signer = web3.Keypair.fromSecretKey(bs58.decode(walletSecretKey));
+const TOKEN_METADATA_PROGRAM_ID = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s")
 
-const metaData = {"name":"Test Banana NFT","symbol":"TNFT","description":"Banana NFT description","seller_fee_basis_points":2500,"image":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/1360px-Banana-Single.jpg","attributes":[{"trait_type":"color","value":"yellow","display_type":"color"},{"trait_type":"size","value":"medium","display_type":"size"}],"external_url":"","properties":{"files":[{"uri":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/1360px-Banana-Single.jpg","type":"unknown"}],"category":"image","creators":[{"address":"2XyukL1KvwDkfNcdBpfXbj6UtPqF7zcUdTDURNjLFAMo","share":100}]}}
+const metaData = {"name":"Test2 Banana NFT","symbol":"TNFT","description":"Banana NFT description","seller_fee_basis_points":2500,"image":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/1360px-Banana-Single.jpg","attributes":[{"trait_type":"color","value":"yellow","display_type":"color"},{"trait_type":"size","value":"medium","display_type":"size"}],"external_url":"","properties":{"files":[{"uri":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/1360px-Banana-Single.jpg","type":"unknown"}],"category":"image","creators":[{"address":"2XyukL1KvwDkfNcdBpfXbj6UtPqF7zcUdTDURNjLFAMo","share":100}]}}
 
 const network = clusterApiUrl("devnet");
 // const opts ={
@@ -52,6 +53,7 @@ const rent_mint = await connection.getMinimumBalanceForRentExemption(
 )
 
 const mint = web3.Keypair.generate();
+console.log(mint.publicKey.toString())
 
 const instructions = []
 
@@ -100,9 +102,8 @@ const mint_tx = new web3.Transaction().add(
         mint.publicKey,
         userTokenAccoutAddress,
         signer.publicKey,
-        5,
-        [],
-		TOKEN_PROGRAM_ID
+        1,
+        []
     ),
     (
         createCreateMasterEditionV3Instruction(
@@ -117,6 +118,8 @@ const mint_tx = new web3.Transaction().add(
     )
 )
 )
+
+
 mint_tx.feePayer = signer.publicKey
 
     console.log(mint_tx)
@@ -183,10 +186,10 @@ async function getMetadata(
 		await PublicKey.findProgramAddress(
 			[
 				Buffer.from("metadata"),
-				TOKEN_PROGRAM_ID.toBuffer(),
+				TOKEN_METADATA_PROGRAM_ID.toBuffer(),
 				mint.toBuffer(),
 			],
-			TOKEN_PROGRAM_ID,
+			TOKEN_METADATA_PROGRAM_ID,
 		)
 	)[0]
 }
@@ -210,11 +213,11 @@ async function getMasterEdition(
 		await PublicKey.findProgramAddress(
 			[
 				Buffer.from("metadata"),
-				TOKEN_PROGRAM_ID.toBuffer(),
+				TOKEN_METADATA_PROGRAM_ID.toBuffer(),
 				mint.toBuffer(),
 				Buffer.from("edition"),
 			],
-			TOKEN_PROGRAM_ID,
+			TOKEN_METADATA_PROGRAM_ID,
 		)
 	)[0]
 }
