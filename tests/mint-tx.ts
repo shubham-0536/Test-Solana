@@ -1,7 +1,7 @@
 
 import { Connection, PublicKey, TransactionInstruction, clusterApiUrl, TransactionMessage } from "@solana/web3.js"
 import { SystemProgram, SYSVAR_RENT_PUBKEY } from "@solana/web3.js"
-import { MintLayout, createInitializeMintInstruction, createMintToInstruction, TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from "@solana/spl-token"
+import { MintLayout, Token, TOKEN_PROGRAM_ID } from "@solana/spl-token"
 import { BN } from "@project-serum/anchor"
 import {
 	DataV2,
@@ -19,6 +19,8 @@ import type { Uses } from "@metaplex-foundation/mpl-token-metadata"
 import {Program,AnchorProvider, web3, utils } from "@project-serum/anchor";
 import { bs58 } from "@project-serum/anchor/dist/cjs/utils/bytes"
 
+const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL")
+
 const walletSecretKey = "4q7nQc1CxJiF4tgnmhVc1p1DM2itAXdT3WHNJg6F1nLAfFzRudM7sSZJ3egnjaPVyobkPuWxPx8Q75CcKmga5qKG";
 
 const signer = web3.Keypair.fromSecretKey(bs58.decode(walletSecretKey));
@@ -32,8 +34,6 @@ const network = clusterApiUrl("devnet");
 //   }
 
 const connection = new Connection(network);
-
-
 
 function createMetaData(metaData){
 
@@ -83,12 +83,12 @@ const mint_tx = new web3.Transaction().add(
         space: MintLayout.span,
         programId: TOKEN_PROGRAM_ID,
     }),
-    createInitializeMintInstruction(
+    Token.createInitMintInstruction(
+		TOKEN_PROGRAM_ID,
         mint.publicKey,
         0,
         signer.publicKey,
-        signer.publicKey,
-        TOKEN_PROGRAM_ID
+        signer.publicKey,   
     ),
     createAssociatedTokenAccountInstruction(
         userTokenAccoutAddress,
@@ -106,12 +106,13 @@ const mint_tx = new web3.Transaction().add(
             payer: signer.publicKey
         }, {createMetadataAccountArgsV2: {data: createMetaData(metaData), isMutable: true}} 
     ),
-    createMintToInstruction(
+    Token.createMintToInstruction(
+		TOKEN_PROGRAM_ID,
         mint.publicKey,
         userTokenAccoutAddress,
         signer.publicKey,
-        1,
-        []
+        [],
+		1
     ),
     (
         createCreateMasterEditionV3Instruction(
