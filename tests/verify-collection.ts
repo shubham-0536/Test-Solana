@@ -1,7 +1,7 @@
 
 import { Connection, PublicKey, TransactionInstruction, clusterApiUrl, TransactionMessage } from "@solana/web3.js"
 import { SystemProgram, SYSVAR_RENT_PUBKEY } from "@solana/web3.js"
-import { MintLayout, createInitializeMintInstruction, createMintToInstruction, TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from "@solana/spl-token"
+// import { MintLayout, createInitializeMintInstruction, createMintToInstruction, TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from "@solana/spl-token"
 import { BN } from "@project-serum/anchor"
 import {
 	DataV2,
@@ -57,7 +57,7 @@ async function main(){
       connection,
       metadata
     );
-    console.log(px.updateAuthority.toString())
+    console.log(px.data.creators)
 
     const verify_collection_instruction  = createVerifySizedCollectionItemInstruction(
 		{
