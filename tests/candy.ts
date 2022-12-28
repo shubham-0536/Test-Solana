@@ -6,7 +6,7 @@ import {
   toCandyMachineV2InstructionData,
   toPublicKey,
 } from "@metaplex-foundation/js";
-import { createInitializeCandyMachineInstruction, PROGRAM_ID } from "@metaplex-foundation/mpl-candy-machine";
+import { createInitializeCandyMachineInstruction, initializeCandyMachineStruct,  PROGRAM_ADDRESS } from "@metaplex-foundation/mpl-candy-machine";
 import { web3 } from "@project-serum/anchor";
 import { bs58 } from "@project-serum/anchor/dist/cjs/utils/bytes";
 import { MintLayout } from "@solana/spl-token";
@@ -95,7 +95,7 @@ async function createCandyMachine(connection) {
       gatekeeper: null,
     },
   };
-  console.log("args ", getCandyMachineV2AccountSizeFromData(args));
+  console.log("args ", args);
   try {
     const candy_tx = new web3.Transaction().add(
       SystemProgram.createAccount({
@@ -105,7 +105,7 @@ async function createCandyMachine(connection) {
         lamports: await connection.getMinimumBalanceForRentExemption(
           getCandyMachineV2AccountSizeFromData(args)
         ),
-        programId: PROGRAM_ID,
+        programId: new PublicKey(PROGRAM_ADDRESS),
       }),
       createInitializeCandyMachineInstruction(
         {

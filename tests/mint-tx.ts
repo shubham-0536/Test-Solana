@@ -75,6 +75,7 @@ const metadataAccount = await getMetadata(mint.publicKey)
 const editionAccount = await getMasterEdition(mint.publicKey)
 
 
+
 const mint_tx = new web3.Transaction().add(
     SystemProgram.createAccount({
         fromPubkey: signer.publicKey,
