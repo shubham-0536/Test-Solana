@@ -71,9 +71,7 @@ const network = clusterApiUrl("devnet");
 const connection = new Connection(network);
 
 async function createCandyMachine(connection) {
-  const rent_candy = await connection.getMinimumBalanceForRentExemption(
-    MintLayout.span
-  );
+
   const candy = web3.Keypair.generate();
   console.log(candy.publicKey.toString());
 
@@ -113,8 +111,8 @@ async function createCandyMachine(connection) {
           wallet: signer.publicKey,
           authority: signer.publicKey,
           payer: signer.publicKey,
-          systemProgram: SystemProgram.programId,
-          rent: new PublicKey(SYSVAR_RENT_PUBKEY),
+          // systemProgram: SystemProgram.programId,
+          // rent: new PublicKey(SYSVAR_RENT_PUBKEY),
         },
         args
       ));

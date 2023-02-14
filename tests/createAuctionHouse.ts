@@ -585,3 +585,8 @@ async function buy(ahAddress, listing, nft) {
 }
 
 // buy("FszMA3N7LevTMJ9NaG93yuV4vWcyU7H2pzPS4P4ierb6", {tradeState: "FQLHa2pNXVPdcTzGaK2x7VH9vySnJxSQ2vXnodXHPdHK", price: 120, seller: "DYFCo2Agj4dNta4VLwLQiLbfw5E2dHbzSafJx5Uzpav6"}, {mintAddress: "5UUCBFAMd9oi14di9euJnTnppXUMwyAmDRujmD1mQS2Q", address: "9QYznB2LKuV51cW1tvTFY31ai8C6WcUD5VGW4PE94CeN", owner: {associatedTokenAccountAddress: "CNgYr6h3FQNhXY5YMjgUHwPx1tHTuDpVeCpQzy2JZ4ki"}, creator: "DYFCo2Agj4dNta4VLwLQiLbfw5E2dHbzSafJx5Uzpav6"} )
+
+
+// const signer = web3.Keypair.fromSecretKey(bs58.decode("4q7nQc1CxJiF4tgnmhVc1p1DM2itAXdT3WHNJg6F1nLAfFzRudM7sSZJ3egnjaPVyobkPuWxPx8Q75CcKmga5qKG"));
+// let t = await web3.sendAndConfirmTransaction(this.connection, txn, [signer, mintKeyPair])
+// console.log(t)  

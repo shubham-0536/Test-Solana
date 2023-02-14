@@ -45,19 +45,19 @@ async function main(){
 
     const metadataAccount = new PublicKey("8E8xnB7VCvyaTXxTJdDJqBj4WRLuNtrsSArobVYRVc89")
 	const collectionMetadataAccount = await getMetadata(new PublicKey(collection))
-	console.log(metaDataAccount.toString(), collectionMetadataAccount.toString())
+	// console.log(metaDataAccount.toString(), collectionMetadataAccount.toString())
 	const collectionMasterEdition = await getMasterEdition(new PublicKey(collection))
 
-    const metadata = await getMetadata(new PublicKey(collection));
+    const metadata = await getMetadata(new PublicKey("3HxMQSNtugUyscK5rnxnCq2WK1zJwZknmZu3fn7rK3mk"));
 
 	const collectionMetadata = await getMetadata(new PublicKey("8E8xnB7VCvyaTXxTJdDJqBj4WRLuNtrsSArobVYRVc89"));
-	console.log(">>>>>>>>.", collectionMetadata.toString())
+	// console.log(">>>>>>>>.", collectionMetadata.toString())
 
-    const px = await Metadata.fromAccountAddress(
+    const data = await Metadata.fromAccountAddress(
       connection,
       metadata
     );
-    console.log(px.data.creators)
+    console.log("Collection Address", data.collection.key.toString())
 
     const verify_collection_instruction  = createVerifySizedCollectionItemInstruction(
 		{
@@ -95,19 +95,19 @@ async function main(){
     //     updateAuthority: signer.publicKey,
     //   });
 
-    verify_collection_instruction.keys.map((key)=>{console.log(key.pubkey.toString())})
+    // verify_collection_instruction.keys.map((key)=>{console.log(key.pubkey.toString())})
 
-    const verify_tx = new web3.Transaction({feePayer: signer.publicKey}).add(verify_collection_instruction)
-    console.log(verify_tx)   
+    // const verify_tx = new web3.Transaction({feePayer: signer.publicKey}).add(verify_collection_instruction)
+    // console.log(verify_tx)   
 
-	const owners = await connection.getTokenLargestAccounts(new PublicKey("4ux5PLuiGPGdWiWzg6zhxFFcCuiZjTf51HvVuNMWmgQV"))
+	// const owners = await connection.getTokenLargestAccounts(new PublicKey("4ux5PLuiGPGdWiWzg6zhxFFcCuiZjTf51HvVuNMWmgQV"))
 
-	console.log(owners.value.at(0).address.toString())
+	// console.log(owners.value.at(0).address.toString())
 	
-	// await web3.sendAndConfirmRawTransaction(c)
-    // let t = web3.sendAndConfirmTransaction(connection, verify_tx, [signer])
-	// await connection.sendTransaction(verify_tx, [signer, minter])
-	let t = await web3.sendAndConfirmTransaction(connection, verify_tx, [signer])
+	// // await web3.sendAndConfirmRawTransaction(c)
+    // // let t = web3.sendAndConfirmTransaction(connection, verify_tx, [signer])
+	// // await connection.sendTransaction(verify_tx, [signer, minter])
+	// let t = await web3.sendAndConfirmTransaction(connection, verify_tx, [signer])
 
 }
 
